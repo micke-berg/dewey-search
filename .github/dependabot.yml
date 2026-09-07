@@ -1,0 +1,42 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # A week of soak time before an update is proposed. Compromised packages
+    # are typically caught and unpublished within days, and nothing here is
+    # urgent enough to be worth being the one who finds out first. Security
+    # advisories bypass this, which is the intent.
+    cooldown:
+      default-days: 7
+    ignore:
+      # typescript-eslint declares `typescript >=4.8.4 <6.1.0`. A major bump
+      # here does not fail loudly, it fails at `npm ci` with a peer conflict
+      # (verified: dependabot opened exactly this PR and CI rejected it).
+      # Remove once typescript-eslint supports TypeScript 7.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # better-sqlite3 13 segfaults with sqlite-vec 0.1.9 on the first vector
+      # query. src/core/native.test.ts catches it, but there is no reason to
+      # keep proposing it. Remove once sqlite-vec ships a compatible release.
+      - dependency-name: better-sqlite3
+        update-types: [version-update:semver-major]
+      # The type definitions should track the Node major this package targets
+      # (engines.node), not run ahead of it. Bump this deliberately alongside
+      # engines, never automatically.
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
+    groups:
+      non-security:
+        applies-to: version-updates
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

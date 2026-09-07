@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main, release-portability]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      # better-sqlite3 and sqlite-vec are native. `npm ci` uses prebuilt
+      # binaries when they exist for the runner and falls back to building
+      # from source, which needs the toolchain already present on ubuntu.
+      - run: npm ci
+
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      - run: npm audit --audit-level=high
+      - run: npm run release:check

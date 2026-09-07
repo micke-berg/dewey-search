@@ -1,0 +1,83 @@
+{
+  "name": "@micke-berg/dewey",
+  "version": "0.1.1",
+  "description": "Hybrid search and staleness reporting over any folder of markdown notes, exposed as an MCP server.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "markdown",
+    "search",
+    "bm25",
+    "embeddings",
+    "hybrid-search",
+    "rrf",
+    "notes"
+  ],
+  "license": "MIT",
+  "author": "Mikael Berg (https://mickeberg.com)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micke-berg/dewey-search.git"
+  },
+  "homepage": "https://github.com/micke-berg/dewey-search#readme",
+  "bugs": {
+    "url": "https://github.com/micke-berg/dewey-search/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "bin": {
+    "dewey": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "docs"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "bench": "tsx src/bench/run.ts",
+    "prepublishOnly": "npm run build",
+    "release:check": "npm run build && node scripts/release-check.mjs",
+    "demo": "npm run build && node scripts/demo.mjs"
+  },
+  "dependencies": {
+    "@huggingface/tokenizers": "0.1.3",
+    "@modelcontextprotocol/server": "2.0.0",
+    "better-sqlite3": "12.11.1",
+    "onnxruntime-node": "1.29.0",
+    "sqlite-vec": "0.1.9",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@modelcontextprotocol/client": "^2.0.0",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^22.20.1",
+    "eslint": "^10.8.0",
+    "tsx": "^4.23.4",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.10"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
