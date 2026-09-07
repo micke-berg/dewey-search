@@ -1,8 +1,7 @@
 # Install, remove and release Dewey
 
-Version 0.1.1 is prepared for public distribution. Until the first npm
-publication, use the public source checkout or the versioned GitHub release
-tarball. Check the release assets before installing.
+Version 0.1.1 is published as `@micke-berg/dewey` on npm. The public source
+checkout and versioned GitHub release tarball remain available.
 
 ## Requirements
 
@@ -20,6 +19,29 @@ The embedding model is a separate first-index download. Obtain permission before
 indexing. `status` and the release smoke test do not download embedding models.
 Index paths belong outside notes and must be separate for personal and work data.
 A cloud assistant can process retrieved text even though retrieval itself is local.
+
+## npm installation, all platforms
+
+For a global CLI:
+
+```sh
+npm install --global @micke-berg/dewey@0.1.1
+dewey --help
+```
+
+If global installation is restricted, use a dedicated tools folder outside your
+notes and install locally:
+
+```sh
+npm install --save-exact @micke-berg/dewey@0.1.1
+node node_modules/@micke-berg/dewey/dist/cli.js --help
+```
+
+Both forms work in PowerShell. Installation does not index notes or download
+embedding models. Use the CLI, notes and index paths from this installation when
+registering the MCP server below. Remove a global installation with
+`npm uninstall --global @micke-berg/dewey`, or run `npm uninstall @micke-berg/dewey`
+from the dedicated tools folder for a local installation. Neither removes notes.
 
 ## Source installation, all platforms
 
@@ -105,7 +127,7 @@ Run from a clean checkout and on Windows, macOS and Linux CI. Review package fil
 contents and the dependency audit. Version the artifact before publishing.
 The source and package are intended to be public. First publication needs an
 npm account that owns the package scope, with two-factor authentication enabled.
-The current proposed name is `@micke-berg/dewey`; confirm ownership before publishing.
+The package scope belongs to the npm account `micke-berg`.
 A successful local pack is not a published release.
 
 After bootstrap publication, configure npm trusted publishing for GitHub owner
