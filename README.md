@@ -63,7 +63,15 @@ table. It stays behind a flag.
 
 ## Install
 
-The first npm publication is being prepared. Install from source today:
+Install the published package with Node 22.12 or newer:
+
+```sh
+npm install --global @micke-berg/dewey@0.1.1
+dewey --help
+```
+
+For an installation without a global command, see
+[installation and removal](docs/release.md). You can also build from source:
 
 ```bash
 git clone https://github.com/micke-berg/dewey-search.git
