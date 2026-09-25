@@ -161,7 +161,10 @@ def main(argv: list[str]) -> int:
             return 2
         for sha in git("rev-list", "--reverse", rest[0]).split():
             short = sha[:8]
-            scanner.scan(f"commit {short} message", git("log", "-1", "--format=%an%n%ae%n%B", sha))
+            # Author and committer emails, not names: a display name is already public on every
+            # commit, while a personal address is not.
+            scanner.scan(f"commit {short} author email", git("log", "-1", "--format=%ae%n%ce", sha))
+            scanner.scan(f"commit {short} message", git("log", "-1", "--format=%B", sha))
             scanner.diff(f"commit {short}", git("show", "-U0", "--no-color", "--format=", "-M", sha))
     elif command == "tree":
         ref = rest[0] if rest else "HEAD"
