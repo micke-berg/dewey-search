@@ -76,6 +76,14 @@ def load_entries(list_path: str | None) -> list[tuple[int, str, re.Pattern[str]]
     return entries
 
 
+TRAILER = re.compile(r"^((?:co-authored-by|signed-off-by|reviewed-by|committed-by):\s*).*?<([^>]*)>\s*$", re.I | re.M)
+
+
+def strip_trailer_names(message: str) -> str:
+    """Keep only the email in Co-authored-by and similar lines, as for authors."""
+    return TRAILER.sub(r"\1<\2>", message)
+
+
 def git(*args: str) -> str:
     return subprocess.run(["git", *args], check=True, capture_output=True, text=True, errors="replace").stdout
 
@@ -164,7 +172,7 @@ def main(argv: list[str]) -> int:
             # Author and committer emails, not names: a display name is already public on every
             # commit, while a personal address is not.
             scanner.scan(f"commit {short} author email", git("log", "-1", "--format=%ae%n%ce", sha))
-            scanner.scan(f"commit {short} message", git("log", "-1", "--format=%B", sha))
+            scanner.scan(f"commit {short} message", strip_trailer_names(git("log", "-1", "--format=%B", sha)))
             scanner.diff(f"commit {short}", git("show", "-U0", "--no-color", "--format=", "-M", sha))
     elif command == "tree":
         ref = rest[0] if rest else "HEAD"
