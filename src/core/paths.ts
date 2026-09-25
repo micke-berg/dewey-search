@@ -27,7 +27,7 @@ export class PathOutsideRootError extends Error {
 /**
  * Resolve a caller-supplied note path to an absolute path inside `root`.
  *
- * Accepts a root-relative path (`Context/voice.md`) or an absolute path that
+ * Accepts a root-relative path (`notes/launch.md`) or an absolute path that
  * happens to be inside the root. Throws `PathOutsideRootError` for anything
  * that escapes, including via `..`, an absolute path elsewhere, or a symlink
  * whose target leaves the tree.

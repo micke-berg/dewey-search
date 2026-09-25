@@ -1,0 +1,62 @@
+name: privacy-guard
+
+# Blocks private words (people, places, the maintainer's own notes and paths)
+# from this repository's code, commits, pull requests, issues and comments.
+# The word list is the PUBLIC_GUARD_LIST secret; it never appears in this
+# repository or in these logs. A match is reported by file, line and list line
+# number only. Without the secret the check fails, so nothing unchecked passes.
+
+on:
+  push:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+  pull_request_review:
+    types: [submitted, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  privacy-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Scan for private words
+        env:
+          PUBLIC_GUARD_LIST_TEXT: ${{ secrets.PUBLIC_GUARD_LIST }}
+          EVENT: ${{ github.event_name }}
+          TITLE: ${{ github.event.pull_request.title || github.event.issue.title }}
+          BODY: ${{ github.event.pull_request.body || github.event.issue.body || github.event.comment.body || github.event.review.body }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          guard=".github/public-guard.py"
+          if [ -z "$PUBLIC_GUARD_LIST_TEXT" ]; then
+            echo "The PUBLIC_GUARD_LIST secret is not available to this run, so nothing can be checked. Failing."
+            exit 1
+          fi
+          status=0
+          printf '%s\n%s\n' "$TITLE" "$BODY" | python3 "$guard" --redact text || status=1
+          case "$EVENT" in
+            push)
+              if git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+                python3 "$guard" --redact commits "$BEFORE..$AFTER" || status=1
+              fi
+              python3 "$guard" --redact tree "$AFTER" || status=1
+              ;;
+            pull_request)
+              python3 "$guard" --redact commits "$BASE..$HEAD" || status=1
+              python3 "$guard" --redact tree "$HEAD" || status=1
+              ;;
+          esac
+          exit $status
