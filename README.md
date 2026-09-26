@@ -66,7 +66,7 @@ table. It stays behind a flag.
 Install the published package with Node 22.12 or newer:
 
 ```sh
-npm install --global @micke-berg/dewey@0.1.1
+npm install --global @micke-berg/dewey@0.1.2
 dewey --help
 ```
 
