@@ -11,12 +11,14 @@ Usage
   public-guard staged                 scan what `git commit` is about to record
   public-guard commits RANGE          scan commits in RANGE: messages, added lines, file names
   public-guard tree [REF]             scan every tracked file at REF (default HEAD)
+  public-guard pack                   scan exactly the files `npm pack` / `npm publish` would upload
   public-guard check-list             show how many entries the list has
 
 Options
   --list PATH   the list (default: $PUBLIC_GUARD_LIST, else ~/.config/public-guard/denylist.txt)
   --redact      never print the matched word or line, only where and which entry number
-                (for public CI logs). The list can also come from $PUBLIC_GUARD_LIST_TEXT.
+                (for public CI logs; automatic when GITHUB_ACTIONS is set).
+                The list can also come from $PUBLIC_GUARD_LIST_TEXT.
 
 List format: one entry per line, # comments.
   Term        whole word or phrase, any case
@@ -31,6 +33,7 @@ Verified with a clean scan before 2026-09-25; no private words live in this file
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -145,6 +148,9 @@ def main(argv: list[str]) -> int:
     if "--redact" in args:
         args.remove("--redact")
         redact = True
+    # Logs of a public repository's workflows are public too.
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        redact = True
     if not args:
         print(__doc__)
         return 2
@@ -182,6 +188,21 @@ def main(argv: list[str]) -> int:
             if b"\0" in blob[:8000]:
                 continue
             scanner.scan(name, blob.decode("utf-8", errors="replace"))
+    elif command == "pack":
+        # --ignore-scripts: listing must not re-run prepublish/prepack hooks,
+        # which is where this command is called from.
+        listing = subprocess.run(
+            ["npm", "pack", "--dry-run", "--json", "--ignore-scripts"], check=True, capture_output=True, text=True
+        ).stdout
+        files = [f["path"] for f in json.loads(listing)[0]["files"]]
+        for name in files:
+            scanner.scan(f"{name} (file name)", name)
+            data = Path(name).read_bytes()
+            if b"\0" in data[:8000]:
+                continue
+            scanner.scan(name, data.decode("utf-8", errors="replace"))
+        if not scanner.hits:
+            print(f"public-guard: {len(files)} files npm would publish are clean.", file=sys.stderr)
     else:
         print(f"public-guard: unknown command {command!r}", file=sys.stderr)
         return 2

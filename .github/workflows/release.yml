@@ -35,6 +35,10 @@ jobs:
       - name: Verify version
         run: node -e 'if (process.env.GITHUB_REF_NAME !== "v" + require("./package.json").version) process.exit(1)'
       - run: npm ci && npm run build
+      - name: Check the package for private words
+        env:
+          PUBLIC_GUARD_LIST_TEXT: ${{ secrets.PUBLIC_GUARD_LIST }}
+        run: python3 .github/public-guard.py pack
       - run: npm pack --pack-destination "$RUNNER_TEMP"
       - name: Checksum and upload
         working-directory: ${{ runner.temp }}
