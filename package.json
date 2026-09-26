@@ -1,6 +1,6 @@
 {
   "name": "@micke-berg/dewey",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Hybrid search and staleness reporting over any folder of markdown notes, exposed as an MCP server.",
   "keywords": [
     "mcp",
