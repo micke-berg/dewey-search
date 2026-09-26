@@ -1,6 +1,6 @@
 # Install, remove and release Dewey
 
-Version 0.1.1 is published as `@micke-berg/dewey` on npm. The public source
+Version 0.1.2 is published as `@micke-berg/dewey` on npm. The public source
 checkout and versioned GitHub release tarball remain available.
 
 ## Requirements
@@ -25,7 +25,7 @@ A cloud assistant can process retrieved text even though retrieval itself is loc
 For a global CLI:
 
 ```sh
-npm install --global @micke-berg/dewey@0.1.1
+npm install --global @micke-berg/dewey@0.1.2
 dewey --help
 ```
 
@@ -33,7 +33,7 @@ If global installation is restricted, use a dedicated tools folder outside your
 notes and install locally:
 
 ```sh
-npm install --save-exact @micke-berg/dewey@0.1.1
+npm install --save-exact @micke-berg/dewey@0.1.2
 node node_modules/@micke-berg/dewey/dist/cli.js --help
 ```
 
